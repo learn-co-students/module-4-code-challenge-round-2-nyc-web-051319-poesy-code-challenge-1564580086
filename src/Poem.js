@@ -20,6 +20,7 @@ class Poem extends React.Component {
         <h3>{title}</h3>
         <p>{content}</p>
         <strong>- By {author}</strong>
+        <button onClick={(e) => this.props.addToLiked(e, this.props.poem)}>Like This!</button>
       </div>
     ); 
   }
