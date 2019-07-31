@@ -11,8 +11,8 @@ class App extends React.Component {
     poems: [],
     username: null,
     loggedIn: false,
-    poemName: null,
-    poemContent: null,
+    poemName: "",
+    poemContent: "",
   }
 
   fetchPoems = () => {
@@ -42,6 +42,12 @@ class App extends React.Component {
       loggedIn: !this.state.loggedIn
     })
   }
+
+  logOut = () => {
+    this.setState({
+      loggedIn: false
+    })
+  }
   
 
     handlePoemForm = (event) => {
@@ -52,14 +58,37 @@ class App extends React.Component {
 
     addPoem = (event) => {
       event.preventDefault()
-      this.setState({
-        poems: [...this.state.poems, {title:this.state.poemName, content:this.state.poemContent, author:this.state.username}]
-      }, () => {
-        this.setState({
-          poemName: "",
-          poemContent: ""
+      fetch(`http://localhost:3000/poems`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({
+          title: this.state.poemName, 
+          content: this.state.poemContent, 
+          author: this.state.username
         })
       })
+      .then(resp => resp.json())
+      .then(newPoem => {
+        this.setState({
+          poems: [...this.state.poems, newPoem]
+        }, () => {
+          this.setState({
+            poemName: "",
+            poemContent: ""
+          })
+        })
+      })
+      // this.setState({
+      //   poems: [...this.state.poems, {title:this.state.poemName, content:this.state.poemContent, author:this.state.username}]
+      // }, () => {
+      //   this.setState({
+      //     poemName: "",
+      //     poemContent: ""
+      //   })
+      // })
     }
 
   
@@ -70,7 +99,7 @@ class App extends React.Component {
         <div className="sidebar">
           {this.state.loggedIn ? 
           <div>
-            <UserHeader username={this.state.username}/>
+            <UserHeader username={this.state.username} logOut={this.logOut}/>
             <NewPoemForm handlePoemForm={this.handlePoemForm} addPoem={this.addPoem} poemName={this.state.poemName} poemContent={this.state.poemContent} /> 
           </div>
             : 
